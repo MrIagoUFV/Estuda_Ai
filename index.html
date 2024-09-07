@@ -80,7 +80,7 @@
         temperature: 1,
         topP: 0.95,
         topK: 64,
-        maxOutputTokens: 16384, // Aumentado para o máximo permitido
+        maxOutputTokens: 16384,
         responseMimeType: "text/plain",
       };
 
@@ -165,15 +165,9 @@ Formatação:
 Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.`;
 
         const prompts = [
-          {
-            text: promptIntroducao
-          },
-          {
-            text: promptInterpretacao
-          },
-          {
-            text: promptAulaCompleta
-          }
+          { text: promptIntroducao },
+          { text: promptInterpretacao },
+          { text: promptAulaCompleta }
         ];
 
         const respostas = await Promise.all(prompts.map(async (prompt) => {
@@ -222,7 +216,6 @@ Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar
           }
         });
 
-        // Adicionar evento de clique para expandir/contrair
         document.querySelectorAll('.accordion-header').forEach(header => {
           header.addEventListener('click', () => {
             const item = header.parentElement;
