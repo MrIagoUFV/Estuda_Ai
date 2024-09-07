@@ -1,50 +1,26 @@
 <!DOCTYPE html>
+<!--
+  Analisador de Questões de Vestibular
+  
+  Este é o arquivo HTML principal que estrutura a interface do usuário da aplicação.
+  Ele inclui os elementos necessários para upload de imagens, exibição de resultados
+  e carregamento dos scripts necessários.
+-->
+
 <html lang="pt-BR">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisador de Questões de Vestibular</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .outra-questao-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .outra-questao-button:hover {
-            background-color: #45a049;
-        }
-        .erro-container {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .tentar-novamente-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .tentar-novamente-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
 </head>
 <body>
+
+
     <div id="app-container">
         <h1>Analisador de Questões de Vestibular</h1>
         <button id="outra-questao-button" class="outra-questao-button">Outra Questão</button>
@@ -76,14 +52,14 @@
                 </div>
                 <div class="accordion-item">
                     <button class="accordion-header">
-                        <span>Interpretação da Questão</span>
+                        <span>Aula</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="accordion-content" id="interpretacao"></div>
                 </div>
                 <div class="accordion-item">
                     <button class="accordion-header">
-                        <span>Aula Completa e Passo a Passo</span>
+                        <span>Passos para Resolver</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="accordion-content" id="aula"></div>
@@ -98,7 +74,11 @@
         </a>
     </footer>
 
+    
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+
     <script type="importmap">
       {
         "imports": {
@@ -106,225 +86,13 @@
         }
       }
     </script>
+
+
     <script type="module">
-      import { GoogleGenerativeAI } from "@google/generative-ai";
-
-      const API_KEY = "AIzaSyBAxF9haxbPv3kZrPdd3ExBcs1WeTdVusk";
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-
-      const generationConfig = {
-        temperature: 1,
-        topP: 0.95,
-        topK: 64,
-        maxOutputTokens: 16384,
-        responseMimeType: "text/plain",
-      };
-
-      async function analisarImagem(imageFile) {
-        const imageData = await blobToBase64(imageFile);
-        const imagePart = {
-          inlineData: {
-            mimeType: imageFile.type,
-            data: imageData
-          }
-        };
-
-
-        const promptIntroducao = `
-
-Analise detalhadamente a imagem da questão do exercício fornecida e responda:
-
-1. Forneça uma introdução bem concisa e informativa sobre a questão.
-2. Liste tópicos  e subtópicos abordados na questão, organizando-os de forma hierárquica.
-3. Para cada tópico e subtópico, forneça um termo de pesquisa específico para o YouTube, visando vídeo-aulas sobre o assunto.
-4. Identifique o tipo exato de exercício apresentado e forneça termos de pesquisa para encontrar exercícios resolvidos similares no YouTube.
-
-Formatação:
-- Use marcadores para listar os tópicos e subtópicos.
-- Para cada termo de pesquisa, crie um link direto para a busca no YouTube no formato: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa+formatado).
-- Utilize markdown para estruturar e formatar o texto, incluindo títulos, subtítulos e ênfases onde apropriado.
-
-Exemplo de estrutura:
-
-## Questão de ...
-
-Esse exercício é um exercício de ... que pede para ...
-
-## Tópicos Abordados
-- Tópico Principal 1
-  - Subtópico 1.1: [Termo de Pesquisa](link)
-  - Subtópico 1.2: [Termo de Pesquisa](link)
-- Tópico Principal 2
-  - Subtópico 2.1: [Termo de Pesquisa](link)
-
-## Exercícios Similares
-- [Tipo de Exercício Resolvido](link)
-- [Variação do Exercício](link)
-
-`;
-
-
-const promptAulaCompleta = `
-
-Com base na questão fornecida, elabore uma aula completa e detalhada, ensinando todo o conteúdo necessário saber antes de resolver o exercício, seguindo estas diretrizes:
-
-- Não cite a questão, apenas o conteúdo necessário para resolver o exercício.
-- Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, fórmulas, listas numeradas e com marcadores.
-- Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.
-- Inclua exemplos práticos quando possível.
-- Busque explicar da forma mais clara e didática possível, como se fosse explicar para um aluno do ensino médio.
-
-
-Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.
-
-`;
-
-const promptMetodologia = `
-
-Desenvolva um framework geral para abordar esse tipo de exercício, aplicável a diversos exercícios do mesmo tipo.
-
-1. Detalhe um passo a passo metodológico para resolver o tipo de questão apresentada, incluindo:
-   - CheatSheet: Fórmulas e conceitos necessários.	
-   - Técnicas de análise inicial do problema.
-   - Estratégias para identificar informações relevantes no enunciado.
-   - Métodos para organizar os dados e planejar a resolução.
-   - Técnicas de verificação e revisão da resposta.
-   - Dicas para evitar erros comuns e armadilhas frequentes neste tipo de questão.
-
-
-Formatação:
-- Não cite a questão, apenas os passos gerais necessários para resolver esse tipo de exercício.
-- Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, listas numeradas e com marcadores.
-- Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.
-
-Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.
-
-`;
-
-
-        const prompts = [
-          { text: promptIntroducao },
-          { text: promptAulaCompleta },
-          { text: promptMetodologia }
-        ];
-
-        const respostas = await Promise.all(prompts.map(async (prompt) => {
-          const result = await model.generateContent({
-            contents: [{ role: "user", parts: [imagePart, prompt] }],
-            generationConfig,
-          });
-          return result.response.text();
-        }));
-
-        return respostas;
-      }
-
-      function blobToBase64(blob) {
-        return new Promise((resolve, _) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(blob);
-        });
-      }
-
-      async function handleImageInput(file) {
-        if (file) {
-          document.getElementById('loading').style.display = 'block';
-          document.getElementById('result').style.display = 'none';
-          document.getElementById('upload-container').style.display = 'none';
-          try {
-            const respostas = await analisarImagem(file);
-            preencherSecoes(respostas);
-            document.getElementById('outra-questao-button').style.display = 'block';
-          } catch (error) {
-            console.error('Erro ao analisar imagem:', error);
-            let mensagemErro = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
-            if (error.message) {
-              mensagemErro += ' Detalhes do erro: ' + error.message;
-            }
-            document.getElementById('result').innerHTML = `
-              <div class="erro-container">
-                <p>${mensagemErro}</p>
-                <button onclick="resetarPagina()" class="tentar-novamente-button">Tentar Novamente</button>
-              </div>
-            `;
-          } finally {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
-          }
-        }
-      }
-
-      function preencherSecoes(respostas) {
-        const ids = ['introducao', 'interpretacao', 'aula'];
-        
-        respostas.forEach((resposta, index) => {
-          const elemento = document.getElementById(ids[index]);
-          if (elemento) {
-            elemento.innerHTML = marked.parse(resposta);
-          }
-        });
-
-        document.querySelectorAll('.accordion-header').forEach(header => {
-          header.addEventListener('click', () => {
-            const item = header.parentElement;
-            const content = item.querySelector('.accordion-content');
-            
-            if (item.classList.contains('active')) {
-              item.classList.remove('active');
-              content.style.maxHeight = '0';
-            } else {
-              item.classList.add('active');
-              content.style.maxHeight = content.scrollHeight + 'px';
-            }
-          });
-        });
-      }
-
-      async function handleClipboardImage() {
-        try {
-          const clipboardItems = await navigator.clipboard.read();
-          for (const clipboardItem of clipboardItems) {
-            for (const type of clipboardItem.types) {
-              if (type.startsWith('image/')) {
-                const blob = await clipboardItem.getType(type);
-                handleImageInput(new File([blob], "clipboard-image.png", { type: blob.type }));
-                return;
-              }
-            }
-          }
-          alert('Nenhuma imagem encontrada no clipboard. Por favor, tire um print e tente novamente.');
-        } catch (err) {
-          console.error('Erro ao acessar o clipboard:', err);
-          alert('Não foi possível acessar o clipboard. Verifique se você deu permissão para o site acessar o clipboard.');
-        }
-      }
-
-      document.getElementById('file-input').addEventListener('change', (event) => {
-        handleImageInput(event.target.files[0]);
-      });
-
-      document.getElementById('camera-input').addEventListener('change', (event) => {
-        handleImageInput(event.target.files[0]);
-      });
-
-      document.getElementById('clipboard-button').addEventListener('click', handleClipboardImage);
-
-      document.getElementById('outra-questao-button').addEventListener('click', () => {
-        // Limpa todos os cookies
-        document.cookie.split(";").forEach(function(c) { 
-          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-        });
-
-        // Limpa o localStorage e sessionStorage
-        localStorage.clear();
-        sessionStorage.clear();
-
-        // Força o recarregamento da página sem usar o cache
-        window.location.reload(true);
-      });
-
+      import { initializeEventListeners } from './init.js';
+      initializeEventListeners();
     </script>
+
+
 </body>
 </html>
