@@ -310,3 +310,13 @@ footer {
         font-size: 20px;
     }
 }
+
+.desktop-only {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+}
