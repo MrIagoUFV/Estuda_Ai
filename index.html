@@ -301,17 +301,6 @@ Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar
         }
       }
 
-      function resetarPagina() {
-        document.getElementById('outra-questao-button').style.display = 'none';
-        document.getElementById('upload-container').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('file-input').value = '';
-        document.getElementById('camera-input').value = '';
-        document.querySelectorAll('.accordion-content').forEach(content => {
-          content.innerHTML = '';
-        });
-      }
-
       document.getElementById('file-input').addEventListener('change', (event) => {
         handleImageInput(event.target.files[0]);
       });
