@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador de Questões de Vestibular</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Analisador de Questões de Vestibular</h1>
+    <div id="upload-container">
+        <label for="file-input" class="upload-label">Escolher imagem</label>
+        <input type="file" id="file-input" accept="image/*">
+        <label for="camera-input" class="upload-label">Tirar foto</label>
+        <input type="file" id="camera-input" accept="image/*" capture="environment">
+        <button id="clipboard-button" class="upload-label">Enviar Print (Só para computador)</button>
+    </div>
+    <div id="loading">Analisando imagem...</div>
+    <div id="result"></div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+    <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+
+      const API_KEY = "AIzaSyBAxF9haxbPv3kZrPdd3ExBcs1WeTdVusk";
+      const genAI = new GoogleGenerativeAI(API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+      const generationConfig = {
+        temperature: 1,
+        topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 8192,
+        responseMimeType: "text/plain",
+      };
+
+      async function analisarImagem(imageFile) {
+        const parts = [
+          {
+            inlineData: {
+              mimeType: imageFile.type,
+              data: await blobToBase64(imageFile)
+            }
+          },
+          {
+            text: `Analise a imagem e responda:
+
+            Estou estudando para um vestibular por questões de provas anteriores e quero que me ajude a estudar e aprender a matéria de cada questão da seguinte maneira:
+
+            1. Vou enviar a questão e o gabarito dela.
+            2. Você interpretá-la, sabendo a responda.
+            3. Você vai listar os tópicos que ela aborda, com o um termo de pesquisa para o Youtube. 
+            4. Você vai listar um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como "exercício resolvido movimento retilíneo uniforme")
+            5. Você vai ensinar uma aula completa sobre tudo o que preciso saber para responder esse tipo de questão por conta própria. Toda a teoria por traz da questão, mas ainda sem entrar na explicação da questão. A aula deve ser dada usando o método Feynman, e deve ser o mais completa possível, explorando toda a teoria necessária para responder a questão. Os termos de pesquisa acima, vão ser caso eu não entenda a sua explicação, eu saber como procurar no Youtube.
+            6. Você vai explicar o passo a passo para resolver questões desse tipo (ainda sem resolver a questão, devem ser etapas gerais, como um framework, que funcione para qualquer exercício similar)
+            7. Retorne tudo em um texto, bem formatado, com tópicos, subtópicos, explicações, etc. em markdown.`
+          }
+        ];
+
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts }],
+          generationConfig,
+        });
+
+        const response = result.response;
+        return response.text();
+      }
+
+      function blobToBase64(blob) {
+        return new Promise((resolve, _) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      async function handleImageInput(file) {
+        if (file) {
+          document.getElementById('loading').style.display = 'block';
+          document.getElementById('result').innerHTML = '';
+          try {
+            const resultado = await analisarImagem(file);
+            document.getElementById('result').innerHTML = marked.parse(resultado);
+          } catch (error) {
+            console.error('Erro ao analisar imagem:', error);
+            document.getElementById('result').textContent = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
+          } finally {
+            document.getElementById('loading').style.display = 'none';
+          }
+        }
+      }
+
+      async function handleClipboardImage() {
+        try {
+          const clipboardItems = await navigator.clipboard.read();
+          for (const clipboardItem of clipboardItems) {
+            for (const type of clipboardItem.types) {
+              if (type.startsWith('image/')) {
+                const blob = await clipboardItem.getType(type);
+                handleImageInput(new File([blob], "clipboard-image.png", { type: blob.type }));
+                return;
+              }
+            }
+          }
+          alert('Nenhuma imagem encontrada no clipboard. Por favor, tire um print e tente novamente.');
+        } catch (err) {
+          console.error('Erro ao acessar o clipboard:', err);
+          alert('Não foi possível acessar o clipboard. Verifique se você deu permissão para o site acessar o clipboard.');
+        }
+      }
+
+      document.getElementById('file-input').addEventListener('change', (event) => {
+        handleImageInput(event.target.files[0]);
+      });
+
+      document.getElementById('camera-input').addEventListener('change', (event) => {
+        handleImageInput(event.target.files[0]);
+      });
+
+      document.getElementById('clipboard-button').addEventListener('click', handleClipboardImage);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
