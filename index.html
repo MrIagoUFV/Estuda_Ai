@@ -80,7 +80,7 @@
         temperature: 1,
         topP: 0.95,
         topK: 64,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 16384, // Aumentado para o máximo permitido
         responseMimeType: "text/plain",
       };
 
@@ -117,6 +117,8 @@
             1. Ensine uma aula completa sobre tudo o que é necessário saber para responder esse tipo de questão por conta própria. Explore toda a teoria por trás da questão, mas sem entrar na explicação específica da questão. Use o método Feynman para explicar os conceitos.
 
             2. Explique o passo a passo geral para resolver questões desse tipo (sem resolver a questão específica, forneça etapas gerais que funcionem para qualquer exercício similar).
+
+            Não se preocupe com o tamanho da resposta, forneça uma explicação completa e detalhada.
 
             Use markdown para formatar o texto.`
           }
@@ -171,7 +173,16 @@
         // Adicionar evento de clique para expandir/contrair
         document.querySelectorAll('.accordion-header').forEach(header => {
           header.addEventListener('click', () => {
-            header.parentElement.classList.toggle('active');
+            const item = header.parentElement;
+            const content = item.querySelector('.accordion-content');
+            
+            if (item.classList.contains('active')) {
+              item.classList.remove('active');
+              content.style.maxHeight = '0';
+            } else {
+              item.classList.add('active');
+              content.style.maxHeight = content.scrollHeight + 'px';
+            }
           });
         });
       }

@@ -142,14 +142,28 @@ h1 {
 .accordion-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
     padding: 0 15px;
-    color: var(--on-surface);
 }
 
 .accordion-item.active .accordion-content {
-    max-height: 1000px;
+    max-height: 2000px; /* Valor alto para acomodar conteúdos longos */
     padding: 15px;
+    overflow-y: auto;
+}
+
+/* Estilizar a barra de rolagem para torná-la menos visível */
+.accordion-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.accordion-content::-webkit-scrollbar-track {
+    background: var(--surface-color);
+}
+
+.accordion-content::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 3px;
 }
 
 /* Estilos para o conteúdo markdown renderizado */
