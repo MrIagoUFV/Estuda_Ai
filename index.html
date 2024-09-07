@@ -17,7 +17,20 @@
         <button id="clipboard-button" class="upload-label">Enviar Print (Só para computador)</button>
     </div>
     <div id="loading">Analisando imagem...</div>
-    <div id="result"></div>
+    <div id="result">
+        <div class="section" id="introducao">
+            <h2>Introdução</h2>
+            <div class="content"></div>
+        </div>
+        <div class="section" id="interpretacao">
+            <h2>Interpretação da Questão</h2>
+            <div class="content"></div>
+        </div>
+        <div class="section" id="aula">
+            <h2>Aula Completa e Passo a Passo</h2>
+            <div class="content"></div>
+        </div>
+    </div>
 
     <script type="importmap">
       {
@@ -42,35 +55,52 @@
       };
 
       async function analisarImagem(imageFile) {
-        const parts = [
+        const imageData = await blobToBase64(imageFile);
+        const imagePart = {
+          inlineData: {
+            mimeType: imageFile.type,
+            data: imageData
+          }
+        };
+
+        const prompts = [
           {
-            inlineData: {
-              mimeType: imageFile.type,
-              data: await blobToBase64(imageFile)
-            }
+            text: `Analise a imagem e responda:
+
+            1. Liste os tópicos que ela aborda, com um termo de pesquisa para o YouTube.
+            2. Forneça termos de pesquisa específicos para exercícios resolvidos similares.
+
+            Para os tópicos abordados e termos de pesquisa, forneça-os no formato de links do YouTube, por exemplo: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa).
+
+            Use markdown para formatar o texto.`
           },
           {
             text: `Analise a imagem e responda:
 
-            Estou estudando para um vestibular por questões de provas anteriores e quero que me ajude a estudar e aprender a matéria de cada questão da seguinte maneira:
+            Interprete a questão sem respondê-la (como um aluno exemplar lendo a questão, entendendo o que ela pede, e separando tudo de importante para respondê-la com excelência).
 
-            1. Vou enviar a questão e o gabarito dela.
-            2. Você interpretá-la, sabendo a responda.
-            3. Você vai listar os tópicos que ela aborda, com o um termo de pesquisa para o Youtube. 
-            4. Você vai listar um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como "exercício resolvido movimento retilíneo uniforme")
-            5. Você vai ensinar uma aula completa sobre tudo o que preciso saber para responder esse tipo de questão por conta própria. Toda a teoria por traz da questão, mas ainda sem entrar na explicação da questão. A aula deve ser dada usando o método Feynman, e deve ser o mais completa possível, explorando toda a teoria necessária para responder a questão. Os termos de pesquisa acima, vão ser caso eu não entenda a sua explicação, eu saber como procurar no Youtube.
-            6. Você vai explicar o passo a passo para resolver questões desse tipo (ainda sem resolver a questão, devem ser etapas gerais, como um framework, que funcione para qualquer exercício similar)
-            7. Retorne tudo em um texto, bem formatado, com tópicos, subtópicos, explicações, etc. em markdown.`
+            Use markdown para formatar o texto.`
+          },
+          {
+            text: `Analise a imagem e responda:
+
+            1. Ensine uma aula completa sobre tudo o que é necessário saber para responder esse tipo de questão por conta própria. Explore toda a teoria por trás da questão, mas sem entrar na explicação específica da questão. Use o método Feynman para explicar os conceitos.
+
+            2. Explique o passo a passo geral para resolver questões desse tipo (sem resolver a questão específica, forneça etapas gerais que funcionem para qualquer exercício similar).
+
+            Use markdown para formatar o texto.`
           }
         ];
 
-        const result = await model.generateContent({
-          contents: [{ role: "user", parts }],
-          generationConfig,
-        });
+        const respostas = await Promise.all(prompts.map(async (prompt) => {
+          const result = await model.generateContent({
+            contents: [{ role: "user", parts: [imagePart, prompt] }],
+            generationConfig,
+          });
+          return result.response.text();
+        }));
 
-        const response = result.response;
-        return response.text();
+        return respostas;
       }
 
       function blobToBase64(blob) {
@@ -84,17 +114,34 @@
       async function handleImageInput(file) {
         if (file) {
           document.getElementById('loading').style.display = 'block';
-          document.getElementById('result').innerHTML = '';
+          document.getElementById('result').style.display = 'none';
           try {
-            const resultado = await analisarImagem(file);
-            document.getElementById('result').innerHTML = marked.parse(resultado);
+            const respostas = await analisarImagem(file);
+            preencherSecoes(respostas);
           } catch (error) {
             console.error('Erro ao analisar imagem:', error);
             document.getElementById('result').textContent = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
           } finally {
             document.getElementById('loading').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
           }
         }
+      }
+
+      function preencherSecoes(respostas) {
+        const ids = ['introducao', 'interpretacao', 'aula'];
+        
+        respostas.forEach((resposta, index) => {
+          const elemento = document.querySelector(`#${ids[index]} .content`);
+          elemento.innerHTML = marked.parse(resposta);
+        });
+
+        // Adicionar evento de clique para expandir/contrair
+        document.querySelectorAll('.section h2').forEach(header => {
+          header.addEventListener('click', () => {
+            header.parentElement.classList.toggle('expanded');
+          });
+        });
       }
 
       async function handleClipboardImage() {
