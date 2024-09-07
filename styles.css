@@ -166,6 +166,17 @@ h1 {
     border-radius: 3px;
 }
 
+/* Estilo para links dentro do conteúdo do accordion */
+.accordion-content a {
+    color: #ffffff;
+    text-decoration: underline;
+    transition: opacity 0.3s ease;
+}
+
+.accordion-content a:hover {
+    opacity: 0.8;
+}
+
 /* Estilos para o conteúdo markdown renderizado */
 .accordion-content h2 {
     color: var(--primary-color);

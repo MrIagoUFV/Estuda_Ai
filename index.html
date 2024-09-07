@@ -93,34 +93,86 @@
           }
         };
 
+        const promptIntroducao = `Analise detalhadamente a imagem da questão de vestibular fornecida e responda:
+
+1. Liste todos os tópicos principais e subtópicos abordados na questão, organizando-os de forma hierárquica.
+2. Para cada tópico e subtópico, forneça um termo de pesquisa específico para o YouTube, visando vídeo-aulas sobre o assunto.
+3. Identifique o tipo exato de exercício apresentado e forneça termos de pesquisa para encontrar exercícios resolvidos similares no YouTube.
+
+Formatação:
+- Use marcadores para listar os tópicos e subtópicos.
+- Para cada termo de pesquisa, crie um link direto para a busca no YouTube no formato: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa+formatado).
+- Utilize markdown para estruturar e formatar o texto, incluindo títulos, subtítulos e ênfases onde apropriado.
+
+Exemplo de estrutura:
+
+## Tópicos Abordados
+- Tópico Principal 1
+  - Subtópico 1.1: [Termo de Pesquisa](link)
+  - Subtópico 1.2: [Termo de Pesquisa](link)
+- Tópico Principal 2
+  - Subtópico 2.1: [Termo de Pesquisa](link)
+
+## Exercícios Similares
+- [Tipo de Exercício Resolvido](link)
+- [Variação do Exercício](link)
+
+Forneça uma introdução concisa e informativa sobre a questão, destacando sua relevância no contexto do vestibular.`;
+
+        const promptInterpretacao = `Analise minuciosamente a imagem da questão de vestibular e forneça uma interpretação detalhada, como se você fosse um aluno exemplar preparando-se para respondê-la com excelência. Sua análise deve incluir:
+
+1. Identificação clara do tema central e dos conceitos-chave abordados na questão.
+2. Explicação do contexto histórico, científico ou literário relevante para a questão, se aplicável.
+3. Destaque das informações cruciais fornecidas no enunciado, incluindo dados numéricos, citações ou referências importantes.
+4. Identificação do tipo de resposta esperada (múltipla escolha, dissertativa, cálculo, etc.) e das habilidades específicas sendo avaliadas.
+5. Análise das possíveis armadilhas ou complexidades na formulação da questão que exigem atenção especial.
+6. Sugestão de estratégias para abordar a questão de maneira eficaz, incluindo técnicas de resolução ou passos iniciais para a resposta.
+
+Formatação:
+- Utilize markdown para estruturar o texto, incluindo títulos, subtítulos, listas e ênfases.
+- Destaque termos-chave ou conceitos importantes usando negrito ou itálico.
+- Se houver fórmulas ou equações relevantes, apresente-as de forma clara e explicativa.
+
+Lembre-se: O objetivo é interpretar e analisar a questão profundamente, sem fornecer a resposta direta. Foque em como um estudante deve abordar e compreender a questão para respondê-la com sucesso.`;
+
+        const promptAulaCompleta = `Com base na imagem da questão de vestibular fornecida, elabore uma aula completa e detalhada, seguindo estas diretrizes:
+
+Parte 1: Aula Teórica Completa
+1. Introduza o tema central da questão, contextualizando-o no âmbito do vestibular e sua importância acadêmica.
+2. Explique todos os conceitos teóricos relacionados à questão, desde os fundamentos até os aspectos mais avançados.
+3. Utilize o Método Feynman para explicar os conceitos complexos de forma simples e compreensível:
+   - Explique como se estivesse ensinando a um estudante do ensino médio.
+   - Use analogias e exemplos do cotidiano para ilustrar conceitos abstratos.
+   - Identifique e esclareça possíveis pontos de confusão.
+4. Apresente fórmulas, equações ou regras relevantes, explicando seu significado e aplicação.
+5. Discuta variações do tema e como ele se relaciona com outros tópicos do currículo.
+
+Parte 2: Metodologia de Resolução
+1. Desenvolva um framework geral para abordar questões similares, aplicável a diversos exercícios do mesmo tipo.
+2. Detalhe um passo a passo metodológico para resolver o tipo de questão apresentada, incluindo:
+   - Técnicas de análise inicial do problema.
+   - Estratégias para identificar informações relevantes no enunciado.
+   - Métodos para organizar os dados e planejar a resolução.
+   - Técnicas de verificação e revisão da resposta.
+3. Forneça dicas para evitar erros comuns e armadilhas frequentes neste tipo de questão.
+4. Sugira exercícios complementares ou variações para praticar e aprofundar o entendimento.
+
+Formatação:
+- Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, listas numeradas e com marcadores.
+- Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.
+- Inclua exemplos práticos e, se possível, represente visualmente conceitos através de descrições de diagramas ou gráficos.
+
+Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.`;
+
         const prompts = [
           {
-            text: `Analise a imagem e responda:
-
-            1. Liste os tópicos que ela aborda, com um termo de pesquisa para o YouTube.
-            2. Forneça termos de pesquisa específicos para exercícios resolvidos similares.
-
-            Para os tópicos abordados e termos de pesquisa, forneça-os no formato de links do YouTube, por exemplo: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa).
-
-            Use markdown para formatar o texto.`
+            text: promptIntroducao
           },
           {
-            text: `Analise a imagem e responda:
-
-            Interprete a questão sem respondê-la (como um aluno exemplar lendo a questão, entendendo o que ela pede, e separando tudo de importante para respondê-la com excelência).
-
-            Use markdown para formatar o texto.`
+            text: promptInterpretacao
           },
           {
-            text: `Analise a imagem e responda:
-
-            1. Ensine uma aula completa sobre tudo o que é necessário saber para responder esse tipo de questão por conta própria. Explore toda a teoria por trás da questão, mas sem entrar na explicação específica da questão. Use o método Feynman para explicar os conceitos.
-
-            2. Explique o passo a passo geral para resolver questões desse tipo (sem resolver a questão específica, forneça etapas gerais que funcionem para qualquer exercício similar).
-
-            Não se preocupe com o tamanho da resposta, forneça uma explicação completa e detalhada.
-
-            Use markdown para formatar o texto.`
+            text: promptAulaCompleta
           }
         ];
 
