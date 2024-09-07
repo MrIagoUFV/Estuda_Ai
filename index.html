@@ -7,10 +7,47 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .outra-questao-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .outra-questao-button:hover {
+            background-color: #45a049;
+        }
+        .erro-container {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .tentar-novamente-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .tentar-novamente-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div id="app-container">
         <h1>Analisador de Questões de Vestibular</h1>
+        <button id="outra-questao-button" class="outra-questao-button">Outra Questão</button>
         <div id="upload-container">
             <label for="file-input" class="upload-button">
                 <i class="fas fa-file-upload"></i> Escolher imagem
@@ -93,11 +130,15 @@
           }
         };
 
-        const promptIntroducao = `Analise detalhadamente a imagem da questão de vestibular fornecida e responda:
 
-1. Liste todos os tópicos principais e subtópicos abordados na questão, organizando-os de forma hierárquica.
-2. Para cada tópico e subtópico, forneça um termo de pesquisa específico para o YouTube, visando vídeo-aulas sobre o assunto.
-3. Identifique o tipo exato de exercício apresentado e forneça termos de pesquisa para encontrar exercícios resolvidos similares no YouTube.
+        const promptIntroducao = `
+
+Analise detalhadamente a imagem da questão do exercício fornecida e responda:
+
+1. Forneça uma introdução bem concisa e informativa sobre a questão.
+2. Liste tópicos  e subtópicos abordados na questão, organizando-os de forma hierárquica.
+3. Para cada tópico e subtópico, forneça um termo de pesquisa específico para o YouTube, visando vídeo-aulas sobre o assunto.
+4. Identifique o tipo exato de exercício apresentado e forneça termos de pesquisa para encontrar exercícios resolvidos similares no YouTube.
 
 Formatação:
 - Use marcadores para listar os tópicos e subtópicos.
@@ -105,6 +146,10 @@ Formatação:
 - Utilize markdown para estruturar e formatar o texto, incluindo títulos, subtítulos e ênfases onde apropriado.
 
 Exemplo de estrutura:
+
+## Questão de ...
+
+Esse exercício é um exercício de ... que pede para ...
 
 ## Tópicos Abordados
 - Tópico Principal 1
@@ -117,57 +162,51 @@ Exemplo de estrutura:
 - [Tipo de Exercício Resolvido](link)
 - [Variação do Exercício](link)
 
-Forneça uma introdução concisa e informativa sobre a questão, destacando sua relevância no contexto do vestibular.`;
+`;
 
-        const promptInterpretacao = `Analise minuciosamente a imagem da questão de vestibular e forneça uma interpretação detalhada, como se você fosse um aluno exemplar preparando-se para respondê-la com excelência. Sua análise deve incluir:
 
-1. Identificação clara do tema central e dos conceitos-chave abordados na questão.
-2. Explicação do contexto histórico, científico ou literário relevante para a questão, se aplicável.
-3. Destaque das informações cruciais fornecidas no enunciado, incluindo dados numéricos, citações ou referências importantes.
-4. Identificação do tipo de resposta esperada (múltipla escolha, dissertativa, cálculo, etc.) e das habilidades específicas sendo avaliadas.
-5. Análise das possíveis armadilhas ou complexidades na formulação da questão que exigem atenção especial.
-6. Sugestão de estratégias para abordar a questão de maneira eficaz, incluindo técnicas de resolução ou passos iniciais para a resposta.
+const promptAulaCompleta = `
 
-Formatação:
-- Utilize markdown para estruturar o texto, incluindo títulos, subtítulos, listas e ênfases.
-- Destaque termos-chave ou conceitos importantes usando negrito ou itálico.
-- Se houver fórmulas ou equações relevantes, apresente-as de forma clara e explicativa.
+Com base na questão fornecida, elabore uma aula completa e detalhada, ensinando todo o conteúdo necessário saber antes de resolver o exercício, seguindo estas diretrizes:
 
-Lembre-se: O objetivo é interpretar e analisar a questão profundamente, sem fornecer a resposta direta. Foque em como um estudante deve abordar e compreender a questão para respondê-la com sucesso.`;
+- Não cite a questão, apenas o conteúdo necessário para resolver o exercício.
+- Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, fórmulas, listas numeradas e com marcadores.
+- Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.
+- Inclua exemplos práticos quando possível.
+- Busque explicar da forma mais clara e didática possível, como se fosse explicar para um aluno do ensino médio.
 
-        const promptAulaCompleta = `Com base na imagem da questão de vestibular fornecida, elabore uma aula completa e detalhada, seguindo estas diretrizes:
 
-Parte 1: Aula Teórica Completa
-1. Introduza o tema central da questão, contextualizando-o no âmbito do vestibular e sua importância acadêmica.
-2. Explique todos os conceitos teóricos relacionados à questão, desde os fundamentos até os aspectos mais avançados.
-3. Utilize o Método Feynman para explicar os conceitos complexos de forma simples e compreensível:
-   - Explique como se estivesse ensinando a um estudante do ensino médio.
-   - Use analogias e exemplos do cotidiano para ilustrar conceitos abstratos.
-   - Identifique e esclareça possíveis pontos de confusão.
-4. Apresente fórmulas, equações ou regras relevantes, explicando seu significado e aplicação.
-5. Discuta variações do tema e como ele se relaciona com outros tópicos do currículo.
+Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.
 
-Parte 2: Metodologia de Resolução
-1. Desenvolva um framework geral para abordar questões similares, aplicável a diversos exercícios do mesmo tipo.
-2. Detalhe um passo a passo metodológico para resolver o tipo de questão apresentada, incluindo:
+`;
+
+const promptMetodologia = `
+
+Desenvolva um framework geral para abordar esse tipo de exercício, aplicável a diversos exercícios do mesmo tipo.
+
+1. Detalhe um passo a passo metodológico para resolver o tipo de questão apresentada, incluindo:
+   - CheatSheet: Fórmulas e conceitos necessários.	
    - Técnicas de análise inicial do problema.
    - Estratégias para identificar informações relevantes no enunciado.
    - Métodos para organizar os dados e planejar a resolução.
    - Técnicas de verificação e revisão da resposta.
-3. Forneça dicas para evitar erros comuns e armadilhas frequentes neste tipo de questão.
-4. Sugira exercícios complementares ou variações para praticar e aprofundar o entendimento.
+   - Dicas para evitar erros comuns e armadilhas frequentes neste tipo de questão.
+
 
 Formatação:
+- Não cite a questão, apenas os passos gerais necessários para resolver esse tipo de exercício.
 - Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, listas numeradas e com marcadores.
 - Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.
-- Inclua exemplos práticos e, se possível, represente visualmente conceitos através de descrições de diagramas ou gráficos.
 
-Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.`;
+Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar com o tamanho da resposta. O objetivo é criar um recurso de estudo completo e valioso para o estudante.
+
+`;
+
 
         const prompts = [
           { text: promptIntroducao },
-          { text: promptInterpretacao },
-          { text: promptAulaCompleta }
+          { text: promptAulaCompleta },
+          { text: promptMetodologia }
         ];
 
         const respostas = await Promise.all(prompts.map(async (prompt) => {
@@ -193,12 +232,23 @@ Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar
         if (file) {
           document.getElementById('loading').style.display = 'block';
           document.getElementById('result').style.display = 'none';
+          document.getElementById('upload-container').style.display = 'none';
           try {
             const respostas = await analisarImagem(file);
             preencherSecoes(respostas);
+            document.getElementById('outra-questao-button').style.display = 'block';
           } catch (error) {
             console.error('Erro ao analisar imagem:', error);
-            document.getElementById('result').textContent = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
+            let mensagemErro = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
+            if (error.message) {
+              mensagemErro += ' Detalhes do erro: ' + error.message;
+            }
+            document.getElementById('result').innerHTML = `
+              <div class="erro-container">
+                <p>${mensagemErro}</p>
+                <button onclick="resetarPagina()" class="tentar-novamente-button">Tentar Novamente</button>
+              </div>
+            `;
           } finally {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('result').style.display = 'block';
@@ -251,6 +301,17 @@ Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar
         }
       }
 
+      function resetarPagina() {
+        document.getElementById('outra-questao-button').style.display = 'none';
+        document.getElementById('upload-container').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('file-input').value = '';
+        document.getElementById('camera-input').value = '';
+        document.querySelectorAll('.accordion-content').forEach(content => {
+          content.innerHTML = '';
+        });
+      }
+
       document.getElementById('file-input').addEventListener('change', (event) => {
         handleImageInput(event.target.files[0]);
       });
@@ -260,6 +321,21 @@ Observação: Forneça uma explicação abrangente e detalhada, sem se preocupar
       });
 
       document.getElementById('clipboard-button').addEventListener('click', handleClipboardImage);
+
+      document.getElementById('outra-questao-button').addEventListener('click', () => {
+        // Limpa todos os cookies
+        document.cookie.split(";").forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+
+        // Limpa o localStorage e sessionStorage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Força o recarregamento da página sem usar o cache
+        window.location.reload(true);
+      });
+
     </script>
 </body>
 </html>
