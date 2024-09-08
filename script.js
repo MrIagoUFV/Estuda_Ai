@@ -14,22 +14,38 @@ async function tirarFoto() {
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-            video.play();
+        const videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+        videoElement.autoplay = true;
+        videoElement.style.width = '100%';
+        videoElement.style.maxWidth = '400px';
+
+        const captureButton = document.createElement('button');
+        captureButton.textContent = 'Capturar Foto';
+        captureButton.style.display = 'block';
+        captureButton.style.margin = '10px auto';
+
+        const cameraContainer = document.createElement('div');
+        cameraContainer.appendChild(videoElement);
+        cameraContainer.appendChild(captureButton);
+
+        document.body.appendChild(cameraContainer);
+
+        captureButton.onclick = () => {
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            canvas.getContext('2d').drawImage(videoElement, 0, 0);
+
             stream.getTracks().forEach(track => track.stop());
+            document.body.removeChild(cameraContainer);
 
             canvas.toBlob(blob => {
                 processarFoto(new File([blob], "foto.jpg", { type: "image/jpeg" }));
             }, 'image/jpeg');
         };
     } catch (erro) {
-        console.error("Erro ao tirar foto:", erro);
+        console.error("Erro ao acessar a câmera:", erro);
         if (erro.name === 'NotAllowedError') {
             alert("Permissão para acessar a câmera foi negada. Por favor, permita o acesso à câmera nas configurações do seu navegador.");
         } else {
