@@ -6,37 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Função para tirar foto
-async function tirarFoto() {
-    if ('showOpenFilePicker' in window) {
-        try {
-            const [fileHandle] = await window.showOpenFilePicker({
-                types: [{
-                    description: 'Images',
-                    accept: {
-                        'image/*': ['.png', '.gif', '.jpeg', '.jpg']
-                    }
-                }],
-                multiple: false
-            });
-            const file = await fileHandle.getFile();
-            processarFoto(file);
-        } catch (erro) {
-            console.error("Erro ao selecionar arquivo:", erro);
-            alert("Ocorreu um erro ao selecionar o arquivo. Por favor, tente novamente.");
+function tirarFoto() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = (event) => {
+        if (event.target.files.length > 0) {
+            processarFoto(event.target.files[0]);
         }
-    } else {
-        // Fallback para navegadores que não suportam showOpenFilePicker
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'environment';
-        input.onchange = (event) => {
-            if (event.target.files.length > 0) {
-                processarFoto(event.target.files[0]);
-            }
-        };
-        input.click();
-    }
+    };
+    input.click();
 }
 
 // Função para enviar foto
