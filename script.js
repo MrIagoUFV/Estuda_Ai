@@ -138,13 +138,30 @@ function outraQuestao() {
 }
 
 // Adicionar event listeners aos botões
-document.getElementById('tirarFoto').addEventListener('click', tirarFoto);
-document.getElementById('enviarFoto').addEventListener('click', enviarFoto);
-document.getElementById('enviarPrint').addEventListener('click', enviarPrint);
-document.getElementById('outraQuestao').addEventListener('click', outraQuestao);
+document.addEventListener('DOMContentLoaded', () => {
+    const tirarFotoBtn = document.getElementById('tirarFoto');
+    const enviarPrintBtn = document.getElementById('enviarPrint');
+
+    if (isMobileDevice()) {
+        tirarFotoBtn.style.display = 'inline-block';
+        enviarPrintBtn.style.display = 'none';
+    } else {
+        tirarFotoBtn.style.display = 'none';
+        enviarPrintBtn.style.display = 'inline-block';
+    }
+
+    tirarFotoBtn.addEventListener('click', tirarFoto);
+    document.getElementById('enviarFoto').addEventListener('click', enviarFoto);
+    enviarPrintBtn.addEventListener('click', enviarPrint);
+    document.getElementById('outraQuestao').addEventListener('click', outraQuestao);
+});
 
 // Inicializar o marked
 marked.use({
     breaks: true,
     gfm: true
 });
+
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
