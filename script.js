@@ -7,50 +7,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Função para tirar foto
 async function tirarFoto() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Seu navegador não suporta acesso à câmera. Por favor, use um navegador mais recente.");
-        return;
-    }
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        const videoElement = document.createElement('video');
-        videoElement.srcObject = stream;
-        videoElement.autoplay = true;
-        videoElement.style.width = '100%';
-        videoElement.style.maxWidth = '400px';
-
-        const captureButton = document.createElement('button');
-        captureButton.textContent = 'Capturar Foto';
-        captureButton.style.display = 'block';
-        captureButton.style.margin = '10px auto';
-
-        const cameraContainer = document.createElement('div');
-        cameraContainer.appendChild(videoElement);
-        cameraContainer.appendChild(captureButton);
-
-        document.body.appendChild(cameraContainer);
-
-        captureButton.onclick = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            canvas.getContext('2d').drawImage(videoElement, 0, 0);
-
-            stream.getTracks().forEach(track => track.stop());
-            document.body.removeChild(cameraContainer);
-
-            canvas.toBlob(blob => {
-                processarFoto(new File([blob], "foto.jpg", { type: "image/jpeg" }));
-            }, 'image/jpeg');
-        };
-    } catch (erro) {
-        console.error("Erro ao acessar a câmera:", erro);
-        if (erro.name === 'NotAllowedError') {
-            alert("Permissão para acessar a câmera foi negada. Por favor, permita o acesso à câmera nas configurações do seu navegador.");
-        } else {
-            alert("Ocorreu um erro ao acessar a câmera. Por favor, verifique as permissões e tente novamente.");
+    if ('showOpenFilePicker' in window) {
+        try {
+            const [fileHandle] = await window.showOpenFilePicker({
+                types: [{
+                    description: 'Images',
+                    accept: {
+                        'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+                    }
+                }],
+                multiple: false
+            });
+            const file = await fileHandle.getFile();
+            processarFoto(file);
+        } catch (erro) {
+            console.error("Erro ao selecionar arquivo:", erro);
+            alert("Ocorreu um erro ao selecionar o arquivo. Por favor, tente novamente.");
         }
+    } else {
+        // Fallback para navegadores que não suportam showOpenFilePicker
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        input.onchange = (event) => {
+            if (event.target.files.length > 0) {
+                processarFoto(event.target.files[0]);
+            }
+        };
+        input.click();
     }
 }
 
