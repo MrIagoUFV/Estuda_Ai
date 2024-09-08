@@ -13,10 +13,10 @@ async function tirarFoto() {
     }
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         const video = document.createElement('video');
         video.srcObject = stream;
-        video.onloadedmetadata = async () => {
+        video.onloadedmetadata = () => {
             video.play();
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
