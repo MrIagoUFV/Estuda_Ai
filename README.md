@@ -64,7 +64,7 @@ Além disso, o Estuda Ai também fornece uma aula completa sobre o tema da quest
 
 ## PRINT DA APLICAÇÃO (Para ser usado na imagem do da descrição do projeto portifólio)
 
-![Tava na pausa dos estudos (2)](https://github.com/user-attachments/assets/7666aa7f-e93a-4925-a73d-2a6a290aaca9)
+![EstudaAi](https://github.com/user-attachments/assets/7666aa7f-e93a-4925-a73d-2a6a290aaca9)
 
 
 ## Exemplo de uso
