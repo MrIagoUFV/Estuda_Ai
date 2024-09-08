@@ -7,25 +7,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Função para tirar foto
 async function tirarFoto() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Seu navegador não suporta acesso à câmera. Por favor, use um navegador mais recente.");
+        return;
+    }
+
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         const video = document.createElement('video');
         video.srcObject = stream;
-        await video.play();
+        video.onloadedmetadata = async () => {
+            video.play();
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            stream.getTracks().forEach(track => track.stop());
 
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-
-        stream.getTracks().forEach(track => track.stop());
-
-        canvas.toBlob(blob => {
-            processarFoto(new File([blob], "foto.jpg", { type: "image/jpeg" }));
-        }, 'image/jpeg');
+            canvas.toBlob(blob => {
+                processarFoto(new File([blob], "foto.jpg", { type: "image/jpeg" }));
+            }, 'image/jpeg');
+        };
     } catch (erro) {
         console.error("Erro ao tirar foto:", erro);
-        alert("Não foi possível acessar a câmera. Por favor, verifique as permissões.");
+        if (erro.name === 'NotAllowedError') {
+            alert("Permissão para acessar a câmera foi negada. Por favor, permita o acesso à câmera nas configurações do seu navegador.");
+        } else {
+            alert("Ocorreu um erro ao acessar a câmera. Por favor, verifique as permissões e tente novamente.");
+        }
     }
 }
 
