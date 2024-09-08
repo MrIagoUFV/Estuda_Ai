@@ -5,19 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new Accordion('.accordion-container');
 });
 
-// Função para tirar foto
-function tirarFoto() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = (event) => {
-        if (event.target.files.length > 0) {
-            processarFoto(event.target.files[0]);
-        }
-    };
-    input.click();
-}
 
 // Função para enviar foto
 function enviarFoto() {
@@ -145,4 +132,102 @@ marked.use({
 
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+
+function tirarFoto() {
+    // Criar elementos HTML
+    const cameraContainer = document.createElement('div');
+    const video = document.createElement('video');
+    const canvas = document.createElement('canvas');
+    const captureBtn = document.createElement('button');
+    const closeBtn = document.createElement('button');
+
+    // Configurar estilos
+    cameraContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        z-index: 1000;
+    `;
+    video.style.cssText = `
+        width: 100%;
+        height: calc(100% - 100px);
+        object-fit: cover;
+    `;
+    canvas.style.display = 'none';
+    captureBtn.textContent = 'Tirar Foto';
+    captureBtn.style.cssText = `
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    `;
+    closeBtn.textContent = 'Fechar';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    `;
+
+    // Adicionar elementos ao DOM
+    cameraContainer.appendChild(video);
+    cameraContainer.appendChild(canvas);
+    cameraContainer.appendChild(captureBtn);
+    cameraContainer.appendChild(closeBtn);
+    document.body.appendChild(cameraContainer);
+
+    // Acessar a câmera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(error => {
+            console.error('Erro ao acessar a câmera:', error);
+            alert('Não foi possível acessar a câmera.');
+            cameraContainer.remove();
+        });
+
+    // Função para capturar a foto
+    function capturarFoto() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageDataUrl = canvas.toDataURL('image/jpeg');
+        
+        // Aqui você pode processar ou enviar a imageDataUrl
+        console.log('Foto capturada:', imageDataUrl);
+        
+        // Exemplo: criar uma imagem e exibi-la
+        const img = document.createElement('img');
+        img.src = imageDataUrl;
+        img.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            z-index: 1001;
+        `;
+        document.body.appendChild(img);
+        
+        fecharCamera();
+    }
+
+    // Função para fechar a câmera
+    function fecharCamera() {
+        const stream = video.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        cameraContainer.remove();
+    }
+
+    // Adicionar event listeners
+    captureBtn.addEventListener('click', capturarFoto);
+    closeBtn.addEventListener('click', fecharCamera);
 }
