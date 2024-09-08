@@ -154,3 +154,46 @@ button i {
         width: 100%;
     }
 }
+
+/* Estilos para sobrescrever o Accordion-JS */
+.ac {
+    background-color: var(--secondary-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.ac .ac-header {
+    background-color: var(--secondary-bg) !important;
+}
+
+.ac .ac-trigger {
+    background-color: var(--secondary-bg) !important;
+    color: var(--highlight-color) !important;
+}
+
+.ac .ac-panel {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.ac .ac-panel * {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.ac .ac-panel a {
+    color: var(--link-color) !important;
+}
+
+.ac .ac-panel code {
+    background-color: var(--bg-color) !important;
+    color: var(--highlight-color) !important;
+}
+
+.ac .ac-panel pre {
+    background-color: var(--bg-color) !important;
+}
+
+.ac .ac-panel pre code {
+    background-color: transparent !important;
+    color: var(--text-color) !important;
+}
