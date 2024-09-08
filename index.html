@@ -1,98 +1,65 @@
 <!DOCTYPE html>
-<!--
-  Analisador de Questões de Vestibular
-  
-  Este é o arquivo HTML principal que estrutura a interface do usuário da aplicação.
-  Ele inclui os elementos necessários para upload de imagens, exibição de resultados
-  e carregamento dos scripts necessários.
--->
-
 <html lang="pt-BR">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador de Questões de Vestibular</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <title>Ajuda Ai</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/accordion-js@3.3.4/dist/accordion.min.css">
+    <script src="https://unpkg.com/marked@11.2.0/marked.min.js"></script>
+    <script src="https://unpkg.com/accordion-js@3.3.4/dist/accordion.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+    }
+    </script>
 </head>
 <body>
+    <header>
+        <h1>🤖 Ajuda Ai</h1>
+    </header>
 
+    <main>
+        <section class="botoes">
+            <button id="tirarFoto"><i class="fas fa-camera"></i> Tirar foto</button>
+            <button id="enviarFoto"><i class="fas fa-upload"></i> Enviar foto</button>
+            <button id="enviarPrint"><i class="fas fa-paste"></i> Enviar print</button>
+            <button id="outraQuestao" style="display: none;"><i class="fas fa-question"></i> Outra Questão</button>
+        </section>
 
-    <div id="app-container">
-        <h1>Analisador de Questões de Vestibular</h1>
-        <button id="outra-questao-button" class="outra-questao-button">Outra Questão</button>
-        <div id="upload-container">
-            <label for="file-input" class="upload-button">
-                <i class="fas fa-file-upload"></i> Escolher imagem
-            </label>
-            <input type="file" id="file-input" accept="image/*">
-            <label for="camera-input" class="upload-button">
-                <i class="fas fa-camera"></i> Tirar foto
-            </label>
-            <input type="file" id="camera-input" accept="image/*" capture="environment">
-            <button id="clipboard-button" class="upload-button desktop-only">
-                <i class="fas fa-paste"></i> Enviar Print
-            </button>
+        <!-- Adicione esta div para o indicador de loading -->
+        <div id="loading" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Processando...
         </div>
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>Analisando imagem...</p>
-        </div>
-        <div id="result">
-            <div class="accordion">
-                <div class="accordion-item">
-                    <button class="accordion-header">
-                        <span>Introdução</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="accordion-content" id="introducao"></div>
+
+        <section class="respostas">
+            <div class="accordion-container">
+                <div class="ac">
+                    <h2 class="ac-header">
+                        <button class="ac-trigger">Links</button>
+                    </h2>
+                    <div class="ac-panel">
+                        <div id="linksContent"></div>
+                    </div>
                 </div>
-                <div class="accordion-item">
-                    <button class="accordion-header">
-                        <span>Aula</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="accordion-content" id="interpretacao"></div>
-                </div>
-                <div class="accordion-item">
-                    <button class="accordion-header">
-                        <span>Passos para Resolver</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="accordion-content" id="aula"></div>
+                <div class="ac">
+                    <h2 class="ac-header">
+                        <button class="ac-trigger">Aula Completa</button>
+                    </h2>
+                    <div class="ac-panel">
+                        <div id="aulaContent"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <footer>
-        <a href="https://mriago.me" target="_blank" rel="noopener noreferrer" class="github-link">
-            <i class="fab fa-github"></i>
-        </a>
-    </footer>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
 
-    
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-
-
-    <script type="module">
-      import { initializeEventListeners } from './init.js';
-      initializeEventListeners();
-    </script>
-
-
+    <script src="api.js" type="module"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>

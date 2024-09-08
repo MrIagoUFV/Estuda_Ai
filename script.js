@@ -1,132 +1,141 @@
-import { analisarImagem } from './api.js';
+import { Gemini } from './api.js';
 
-let respostasMemoria = {
-    introducao: '',
-    interpretacao: '',
-    aula: ''
-};
-
+// Inicializar o acordeão quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('file-input').addEventListener('change', (event) => {
-        handleImageInput(event.target.files[0]);
-    });
-
-    document.getElementById('camera-input').addEventListener('change', (event) => {
-        handleImageInput(event.target.files[0]);
-    });
-
-    document.getElementById('clipboard-button').addEventListener('click', handleClipboardImage);
-
-    // Inicializar os event listeners do acordeão
-    initializeAccordion();
+    new Accordion('.accordion-container');
 });
 
-function initializeAccordion() {
-    document.querySelectorAll('.accordion-header').forEach(header => {
-        header.addEventListener('click', toggleAccordion);
-    });
-}
+// Função para tirar foto
+async function tirarFoto() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        await video.play();
 
-async function handleImageInput(file) {
-    if (file) {
-        // Limpar a memória e as divs antes de enviar a nova solicitação
-        limparMemoriaEDivs();
-        
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
-        
-        try {
-            const respostas = await analisarImagem(file);
-            salvarRespostasNaMemoria(respostas);
-            preencherSecoes();
-        } catch (error) {
-            console.error('Erro ao analisar imagem:', error);
-            document.getElementById('result').textContent = 'Ocorreu um erro ao analisar a imagem. Por favor, tente novamente.';
-        } finally {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
-        }
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        stream.getTracks().forEach(track => track.stop());
+
+        canvas.toBlob(blob => {
+            processarFoto(new File([blob], "foto.jpg", { type: "image/jpeg" }));
+        }, 'image/jpeg');
+    } catch (erro) {
+        console.error("Erro ao tirar foto:", erro);
+        alert("Não foi possível acessar a câmera. Por favor, verifique as permissões.");
     }
 }
 
-function limparMemoriaEDivs() {
-    respostasMemoria = {
-        introducao: '',
-        interpretacao: '',
-        aula: ''
+// Função para enviar foto
+function enviarFoto() {
+    const input = document.getElementById('fileInput');
+    input.click();
+    input.onchange = () => {
+        if (input.files.length > 0) {
+            processarFoto(input.files[0]);
+        }
     };
-
-    document.querySelectorAll('.accordion-content').forEach(content => {
-        content.innerHTML = '';
-        content.style.maxHeight = null;
-    });
-
-    document.querySelectorAll('.accordion-item').forEach(item => {
-        item.classList.remove('active');
-    });
 }
 
-function salvarRespostasNaMemoria(respostas) {
-    const keys = ['introducao', 'interpretacao', 'aula'];
-    respostas.forEach((resposta, index) => {
-        respostasMemoria[keys[index]] = resposta;
-    });
-}
-
-function preencherSecoes() {
-    Object.entries(respostasMemoria).forEach(([key, value]) => {
-        const elemento = document.getElementById(key);
-        if (elemento) {
-            elemento.innerHTML = marked.parse(value);
-        }
-    });
-
-    // Abrir a primeira seção por padrão
-    const firstAccordionItem = document.querySelector('.accordion-item');
-    if (firstAccordionItem) {
-        firstAccordionItem.classList.add('active');
-        const content = firstAccordionItem.querySelector('.accordion-content');
-        if (content) {
-            content.style.maxHeight = content.scrollHeight + 'px';
-        }
-    }
-}
-
-function toggleAccordion() {
-    const item = this.parentElement;
-    const content = item.querySelector('.accordion-content');
-    
-    document.querySelectorAll('.accordion-item').forEach(otherItem => {
-        if (otherItem !== item && otherItem.classList.contains('active')) {
-            otherItem.classList.remove('active');
-            otherItem.querySelector('.accordion-content').style.maxHeight = null;
-        }
-    });
-
-    if (item.classList.contains('active')) {
-        item.classList.remove('active');
-        content.style.maxHeight = null;
-    } else {
-        item.classList.add('active');
-        content.style.maxHeight = content.scrollHeight + 'px';
-    }
-}
-
-async function handleClipboardImage() {
+// Função para enviar print do clipboard
+async function enviarPrint() {
     try {
         const clipboardItems = await navigator.clipboard.read();
         for (const clipboardItem of clipboardItems) {
             for (const type of clipboardItem.types) {
                 if (type.startsWith('image/')) {
                     const blob = await clipboardItem.getType(type);
-                    handleImageInput(new File([blob], "clipboard-image.png", { type: blob.type }));
+                    processarFoto(new File([blob], "print.png", { type: type }));
                     return;
                 }
             }
         }
-        alert('Nenhuma imagem encontrada no clipboard. Por favor, tire um print e tente novamente.');
-    } catch (err) {
-        console.error('Erro ao acessar o clipboard:', err);
-        alert('Não foi possível acessar o clipboard. Verifique se você deu permissão para o site acessar o clipboard.');
+        alert("Nenhuma imagem encontrada na área de transferência.");
+    } catch (erro) {
+        console.error("Erro ao acessar a área de transferência:", erro);
+        alert("Não foi possível acessar a área de transferência. Por favor, verifique as permissões.");
     }
 }
+
+// Função para mostrar o indicador de loading
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+}
+
+// Função para esconder o indicador de loading
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+}
+
+async function processarFoto(imageFile) {
+    try {
+        showLoading(); // Mostra o indicador de loading
+        const resultado = await Gemini(imageFile);
+        hideLoading(); // Esconde o indicador de loading
+        exibirResultados(resultado);
+    } catch (erro) {
+        hideLoading(); // Esconde o indicador de loading em caso de erro
+        console.error("Erro ao processar a foto:", erro);
+        alert("Ocorreu um erro ao processar a imagem. Por favor, tente novamente.");
+    }
+}
+
+function exibirResultados(resultado) {
+    const linksContent = document.getElementById('linksContent');
+    const aulaContent = document.getElementById('aulaContent');
+
+    // Parse o markdown e adicione o atributo target="_blank" a todos os links
+    const parsedLinks = marked.parse(resultado.links);
+    const parsedAula = marked.parse(resultado.aula);
+
+    // Função para remover estilos inline e classes
+    function limparEstilos(html) {
+        return html.replace(/style="[^"]*"/g, '')
+                   .replace(/class="[^"]*"/g, '')
+                   .replace(/<a /g, '<a target="_blank" ');
+    }
+
+    linksContent.innerHTML = limparEstilos(parsedLinks);
+    aulaContent.innerHTML = limparEstilos(parsedAula);
+
+    // Mostrar o botão "Outra Questão"
+    document.getElementById('outraQuestao').style.display = 'inline-block';
+
+    // Forçar a aplicação dos estilos escuros
+    document.querySelectorAll('.ac-panel *').forEach(el => {
+        el.style.backgroundColor = 'var(--secondary-bg)';
+        el.style.color = 'var(--text-color)';
+    });
+}
+
+function outraQuestao() {
+    // Limpar cache e cookies
+    if (window.caches) {
+        caches.keys().then(function(names) {
+            for (let name of names)
+                caches.delete(name);
+        });
+    }
+    
+    // Limpar localStorage e sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Recarregar a página
+    window.location.reload(true);
+}
+
+// Adicionar event listeners aos botões
+document.getElementById('tirarFoto').addEventListener('click', tirarFoto);
+document.getElementById('enviarFoto').addEventListener('click', enviarFoto);
+document.getElementById('enviarPrint').addEventListener('click', enviarPrint);
+document.getElementById('outraQuestao').addEventListener('click', outraQuestao);
+
+// Inicializar o marked
+marked.use({
+    breaks: true,
+    gfm: true
+});

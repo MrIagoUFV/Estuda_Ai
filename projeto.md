@@ -1,112 +1,144 @@
-API KEY GEMINI: AIzaSyBAxF9haxbPv3kZrPdd3ExBcs1WeTdVusk
 
-- Sempre usar o modelo gemini-1.5-pro
-- O código deve ser feito em html, css e javascript puro, sem usar frameworks como react, vue, angular, etc.
+# BLUEPRINT
 
-Criar um projeto de uma ia para ajudar estudantes a estudar através de questões:
+- Logo: Emoji de um robô | Título: "Ajuda Ai" centralizado no header
 
-- Envia a foto da questão para a IA, junto com uma descrição em texto da questão: "Insira aqui a resposta da questão ou qualquer outro texto que ajude na interpretação da questão (opcional)" (opcional)
-- A IA deve analisar a questão da seguinte como descrito em # Prompt para IA analisar a imagem e retornar
-- Exiba a resposta em markdown formatado.
+em uma caixa os botões:
 
+- Tirar foto
+- Enviar foto
+- Enviar print (do clipboard)
+- Outra Questão (Inicialmente oculto)
 
-# Prompt para IA analisar a imagem e retornar:
-        """
-        Analise a imagem e responda:
-        
-        Estou estudando para um vestibular por questões de provas anteriores e quero que me ajude a estudar e aprender a matéria de cada questão da seguinte maneira:
+em outra caixa as respostas:
 
-        1. Vou enviar a questão e o gabarito dela.
-        2. Você interpretá-la, sabendo a responda.
-        3. Você vai listar os tópicos que ela aborda, com o um termo de pesquisa para o Youtube. 
-        4. Você vai listar um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como "exercício resolvido movimento retilíneo uniforme")
-        4. Você vai ensinar uma aula completa sobre tudo o que preciso saber para responder esse tipo de questão por conta própria. Toda a teoria por traz da questão, mas ainda sem entrar na explicação da questão. A aula deve ser dada usando o método Feynman, e deve ser o mais completa possível, explorando toda a teoria necessária para responder a questão. Os termos de pesquisa acima, vão ser caso eu não entenda a sua explicação, eu saber como procurar no Youtube.
-        5. Você vai explicar o passo a passo para resolver questões desse tipo (ainda sem resolver a questão, devem ser etapas gerais, como um framework, que funcione para qualquer exercício similar)
-        6. Retorne tudo em um texto, bem formatado, com tópicos, subtópicos, explicações, etc. em markdown.
-        """
+- Acordeon: Links
+    - Exibir um texto em markdown
+- Acordeon: Aula Completa
+    - Exibir um texto em markdown
 
 
-adapte o prompt sugerido pelo proprio gemin para funcionar com qualquer imagem (o código abaixo é para node, adaptá-lo para html como o modelo já disposto no index.html):
+Arquivos:
 
-/*
- * Install the Generative AI SDK
- *
- * $ npm install @google/generative-ai
- */
+- index.html \\ Estrutura básica da página
+- style.css \\ Estilos da página
+- script.js \\ Lógica da página
+- api.js \\ Scripts para comunicar com a API do Gemini
 
-const {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} = require("@google/generative-ai");
-const { GoogleAIFileManager } = require("@google/generative-ai/server");
+Importações:
+- biblioteca para formatar o texto em markdown: marked.js
+- api do google gemini
+- biblioteca para ícones bonitos nos botões: font awesome
+- biblioteca para criar o acordeon: accordion-js
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
-const fileManager = new GoogleAIFileManager(apiKey);
+Funções:
+- Função para botão Tirar foto
+- Função para botão Enviar foto
+- Função para botão Enviar print (do clipboard)
+Esses 3 botões recebem uma foto e enviam para a função Processar Foto:
+- Função Processar foto: 
+	- envia a foto pra função que chama a Função Gemini, e espera a resposta, 
+	- se der certo, chama a função Exibir Resultados com o return do gemini, 
+	- se der erro, exibe a mensagem de erro
+- Função Exibir Resultados:
+	- Recebe o objeto que contém os dois resultados, e atualiza o conteúdo dos dois acordeons exibindo as respostas nos acordeons correspondentes usando a biblioteca para formatar o markdown.
+- Função Gemini: envia duas solicitações, com a mesma imagem, e retorna o objeto com as duas respostas separadas.
 
-/**
- * Uploads the given file to Gemini.
- *
- * See https://ai.google.dev/gemini-api/docs/prompting_with_media
- */
-async function uploadToGemini(path, mimeType) {
-  const uploadResult = await fileManager.uploadFile(path, {
-    mimeType,
-    displayName: path,
+
+Além disso:
+- Adiciona event listeners aos botões.
+- Inicializa oS acordeões.
+- Implementa a funcionalidade do botão "Outra Questão": A função do botão Outra Questão para ter a função de f5, ou seja, forçar recarregar a página, e além disso, limpar todos os cookies, cache e dados da página, para resetar do zero
+
+
+Pontos de atenção:
+1. Lembre-se de garantir que a Função Gemini seja global ou importada corretamente para que este código funcione.
+2. Ajuste as permissões do navegador para acessar a câmera e a área de transferência.
+3. Faça a importação necessária em cada arquivo, declare as variaveis locais e globais necessárias, importe corretamente a api do Gemini
+
+
+Prompts:
+
+const prompt1 = "1. Liste os tópicos que a questão aborda, com um termo de pesquisa para o Youtube. \n2. Liste um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como \"exercício resolvido movimento retilíneo uniforme\")\n\nFormatação:\n- Use marcadores para listar os tópicos.\n- Para cada termo de pesquisa, crie um link direto para a busca no YouTube no formato: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa+formatado).\n- Utilize markdown para estruturar e formatar o texto, incluindo títulos, subtítulos e ênfases onde apropriado.\n\nExemplo de estrutura:\n\n## Tópicos Abordados\n- Tópico 1: [Termo de Pesquisa](link)\n- ...\n\n## Como encontrar exercícios resolvidos similares\n- Exercício resolvido de ... : [Termo de Pesquisa](link)\n- ...\n";
+
+const prompt2 = "- Você vai ensinar uma aula completa sobre tudo o que precisa saber para resolver esse tipo de questão por conta própria. Toda a teoria por trás da questão, mas ainda sem entrar na explicação da questão. A aula deve ser dada usando o método Feynman, e deve ser o mais completa possível, explorando toda a teoria necessária para resolver a questão.\n- Ao final, adicione uma seção chamada \"CheatSheet: liste todas as Fórmulas e conceitos necessários ter em mente para resolver o exercício da foto.\n\nFormatação:\n- Use markdown extensivamente para estruturar o conteúdo, incluindo títulos, subtítulos, fórmulas, listas numeradas e com marcadores.\n- Destaque conceitos-chave, fórmulas e passos importantes usando negrito, itálico ou blocos de código quando apropriado.\n";
+
+
+Documentação:
+
+Importar o SDK e inicializar o modelo generativo
+Antes de fazer chamadas de API, é necessário importar o SDK e inicializar o um modelo generativo. 
+
+<html>
+  <body>
+    <!-- ... Your HTML and CSS -->
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+    <script type="module">
+      import { GoogleGenerativeAI } from "@google/generative-ai";
+
+      // Fetch your API_KEY
+      const API_KEY = "...";
+      // Reminder: This should only be for local testing
+
+      // Access your API key (see "Set up your API key" above)
+      const genAI = new GoogleGenerativeAI(API_KEY);
+
+      // ...
+
+      // The Gemini 1.5 models are versatile and work with most use cases
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+      // ...
+    </script>
+  </body>
+</html>
+
+
+Gerar texto com base em entradas de texto e imagem (multimodal)
+O Gemini fornece vários modelos que podem processar entradas multimodais (modelos Gemini 1.5) para que você possa inserir texto e imagens. Não se esqueça de analisar requisitos de imagem para comandos.
+
+Quando a entrada do comando incluir texto e imagens, use um modelo Gemini 1.5 com o método generateContent para gerar uma saída de texto:
+
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Access your API key (see "Set up your API key" above)
+const genAI = new GoogleGenerativeAI(API_KEY);
+
+// Converts a File object to a GoogleGenerativeAI.Part object.
+async function fileToGenerativePart(file) {
+  const base64EncodedDataPromise = new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(file);
   });
-  const file = uploadResult.file;
-  console.log(`Uploaded file ${file.displayName} as: ${file.name}`);
-  return file;
+  return {
+    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+  };
 }
 
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-pro",
-});
-
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
-
 async function run() {
-  // TODO Make these files available on the local file system
-  // You may need to update the file paths
-  const files = [
-    await uploadToGemini("unnamed.png", "image/png"),
-  ];
+  // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const chatSession = model.startChat({
-    generationConfig,
- // safetySettings: Adjust safety settings
- // See https://ai.google.dev/gemini-api/docs/safety-settings
-    history: [
-      {
-        role: "user",
-        parts: [
-          {
-            fileData: {
-              mimeType: files[0].mimeType,
-              fileUri: files[0].uri,
-            },
-          },
-          {text: "Analise a imagem e responda:\n\n\n        Estou estudando para um vestibular por questões de provas anteriores e quero que me ajude a estudar e aprender a matéria de cada questão da seguinte maneira:\n\n        1. Vou enviar a questão e o gabarito dela.\n        2. Você interpretá-la, sabendo a responda.\n        3. Você vai listar os tópicos que ela aborda, com o um termo de pesquisa para o Youtube. \n        4. Você vai listar um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como \"exercício resolvido movimento retilíneo uniforme\")\n        4. Você vai ensinar uma aula completa sobre tudo o que preciso saber para responder esse tipo de questão por conta própria. Toda a teoria por traz da questão, mas ainda sem entrar na explicação da questão. A aula deve ser dada usando o método Feynman, e deve ser o mais completa possível, explorando toda a teoria necessária para responder a questão. Os termos de pesquisa acima, vão ser caso eu não entenda a sua explicação, eu saber como procurar no Youtube.\n        5. Você vai explicar o passo a passo para resolver questões desse tipo (ainda sem resolver a questão, devem ser etapas gerais, como um framework, que funcione para qualquer exercício similar)\n        6. Retorne tudo em um texto, bem formatado, com tópicos, subtópicos, explicações, etc. em markdown."},
-        ],
-      },
-      {
-        role: "model",
-        parts: [
-          {text: "## Desvendando a Geometria de Quadras Esportivas: Uma Jornada Completa\n\n## Entendendo o Problema\n\n**Questão:** Uma quadra esportiva tem o formato de um retângulo. Sabemos que o perímetro dessa quadra mede 86m e que um lado supera o outro em 11m. O piso dessa quadra será revestido por um de borracha. Assinale a alternativa que indica, CORRETAMENTE, quantos m² desse piso serão gastos:\n\na) 432\nb) 729\nc) 256\n**d) 473**\n\n**Gabarito:** d) 473\n\n**Tópicos Abordados:**\n\n* **Geometria Plana:**  [Pesquisar no Youtube: \"Geometria plana\"](https://www.youtube.com/results?search_query=Geometria+plana)\n* **Retângulos:** [Pesquisar no Youtube: \"Retângulos\"](https://www.youtube.com/results?search_query=Retângulos)\n* **Perímetro:** [Pesquisar no Youtube: \"Perímetro de retângulos\"](https://www.youtube.com/results?search_query=Perímetro+de+retângulos)\n* **Área:** [Pesquisar no Youtube: \"Área de retângulos\"](https://www.youtube.com/results?search_query=Área+de+retângulos)\n* **Sistemas de Equações:** [Pesquisar no Youtube: \"Sistemas de equações do 1º grau\"](https://www.youtube.com/results?search_query=Sistemas+de+equações+do+1º+grau)\n\n\n**Exercício Similar:** [Pesquisar no Youtube: \"Exercício resolvido área e perímetro de retângulos\"](https://www.youtube.com/results?search_query=Exercício+resolvido+área+e+perímetro+de+retângulos)\n\n## Aula Completa sobre Áreas e Perímetros de Retângulos (Método Feynman)\n\nImagina que você quer construir uma quadra esportiva retangular no seu quintal. Para isso, você precisa saber quanta tela comprar para cercar a quadra e quanto de grama comprar para cobrir o chão. É aí que entram o **perímetro** e a **área**.\n\n### O que é um Retângulo?\n\nVamos começar do básico. Um **retângulo** é uma figura geométrica plana com quatro lados e quatro ângulos retos (90 graus).\n\n* **Lados Opostos Congruentes:** Os lados opostos de um retângulo têm o mesmo comprimento.\n* **Ângulos Retos:** Todos os ângulos internos de um retângulo são ângulos retos.\n\n### Perímetro: Contornando a Quadra\n\nImagine que você quer colocar uma cerca ao redor da sua quadra. O **perímetro** é a medida total da linha que forma o contorno de uma figura. No caso do retângulo, é a soma dos comprimentos de todos os seus lados.\n\nSe chamarmos o comprimento do retângulo de \"c\" e a largura de \"l\", podemos calcular o perímetro (P) da seguinte forma:\n\n**Fórmula do Perímetro do Retângulo:** P = 2c + 2l\n\n### Área: Cobrindo o Chão da Quadra\n\nAgora, vamos cobrir o chão da quadra com grama. A **área** de uma figura plana é a medida da superfície que ela ocupa. Para o retângulo, a área é calculada multiplicando o comprimento pela largura.\n\n**Fórmula da Área do Retângulo:** A = c * l\n\n### Resolvendo Problemas com Perímetro e Área\n\nEm muitos problemas, você terá informações sobre o perímetro e/ou a área e precisará encontrar os lados do retângulo. É aí que entram as equações.\n\n1. **Identifique as informações dadas:** O problema fornece o perímetro, a área ou os lados do retângulo?\n2. **Escreva as fórmulas:** Anote as fórmulas do perímetro e/ou da área do retângulo.\n3. **Substitua os valores conhecidos:** Substitua as informações dadas nas fórmulas.\n4. **Resolva as equações:** Use álgebra para isolar as variáveis desconhecidas (comprimento e largura).\n5. **Verifique sua resposta:** Certifique-se de que suas respostas façam sentido no contexto do problema.\n\n## Guia Passo a Passo para Resolver Questões Similares\n\n1. **Compreenda o problema:** Leia atentamente o enunciado e identifique as informações fornecidas (perímetro, diferença entre os lados) e o que se pede (área).\n2. **Defina variáveis:**  Atribua variáveis aos valores desconhecidos. Por exemplo:\n    *  Comprimento do retângulo: **c**\n    *  Largura do retângulo: **l**\n3. **Monte um sistema de equações:** Traduza as informações do problema em equações matemáticas:\n    *  Perímetro: 2c + 2l = 86\n    *  Diferença entre os lados: c = l + 11 \n4. **Resolva o sistema de equações:** Encontre os valores de \"c\" e \"l\" que satisfazem amba"},
-        ],
-      },
-    ],
-  });
+  const prompt = "What's different between these pictures?";
 
-  const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-  console.log(result.response.text());
+  const fileInputEl = document.querySelector("input[type=file]");
+  const imageParts = await Promise.all(
+    [...fileInputEl.files].map(fileToGenerativePart)
+  );
+
+  const result = await model.generateContent([prompt, ...imageParts]);
+  const response = await result.response;
+  const text = response.text();
+  console.log(text);
 }
 
 run();
