@@ -150,34 +150,72 @@ function tirarFoto() {
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: #000;
+        background-color: rgba(0, 0, 0, 0.9);
         z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     `;
     video.style.cssText = `
-        width: 100%;
-        height: calc(100% - 100px);
+        width: 90%;
+        max-height: 70vh;
         object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     `;
     canvas.style.display = 'none';
-    captureBtn.textContent = 'Tirar Foto';
+    
+    const buttonStyle = `
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 10px;
+    `;
+    
+    captureBtn.innerHTML = '&#10004;'; // Símbolo de check
     captureBtn.style.cssText = `
+        ${buttonStyle}
+        background-color: #28a745;
+    `;
+    captureBtn.onmouseover = () => captureBtn.style.backgroundColor = '#218838';
+    captureBtn.onmouseout = () => captureBtn.style.backgroundColor = '#28a745';
+    
+    closeBtn.innerHTML = '&#10006;'; // Símbolo de X
+    closeBtn.style.cssText = `
+        ${buttonStyle}
+        background-color: #dc3545;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.backgroundColor = '#c82333';
+    closeBtn.onmouseout = () => closeBtn.style.backgroundColor = '#dc3545';
+
+    // Criar container para os botões
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
         position: absolute;
-        bottom: 20px;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
     `;
-    closeBtn.textContent = 'Fechar';
-    closeBtn.style.cssText = `
-        position: absolute;
-        top: 20px;
-        right: 20px;
-    `;
+    buttonContainer.appendChild(closeBtn);
+    buttonContainer.appendChild(captureBtn);
 
     // Adicionar elementos ao DOM
     cameraContainer.appendChild(video);
     cameraContainer.appendChild(canvas);
-    cameraContainer.appendChild(captureBtn);
-    cameraContainer.appendChild(closeBtn);
+    cameraContainer.appendChild(buttonContainer);
     document.body.appendChild(cameraContainer);
 
     // Acessar a câmera
@@ -199,10 +237,8 @@ function tirarFoto() {
         canvas.getContext('2d').drawImage(video, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg');
         
-        // Aqui você pode processar ou enviar a imageDataUrl
         console.log('Foto capturada:', imageDataUrl);
         
-        // Exemplo: criar uma imagem e exibi-la
         const img = document.createElement('img');
         img.src = imageDataUrl;
         img.style.cssText = `
@@ -213,6 +249,8 @@ function tirarFoto() {
             max-width: 90%;
             max-height: 90%;
             z-index: 1001;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         `;
         document.body.appendChild(img);
         
