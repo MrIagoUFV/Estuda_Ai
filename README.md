@@ -55,12 +55,17 @@ Além disso, o Estuda Ai também fornece uma aula completa sobre o tema da quest
 
 ## LINK
 
-[https://mriago.me/Study-by-questions/](https://mriago.me/Estuda_Ai)
+[https://mriago.me/Estuda_Ai/](https://mriago.me/Estuda_Ai)
+
+## LOGO (Para ser usado na imagem do da descrição do projeto portifólio)
+
+![Design sem nome (11)](https://github.com/user-attachments/assets/65d0bec0-e009-47f8-aa3d-47d66f5ef20a)
 
 
 ## PRINT DA APLICAÇÃO (Para ser usado na imagem do da descrição do projeto portifólio)
 
-![image](https://github.com/user-attachments/assets/01a15361-c754-4864-b82d-aa5b58333b57)
+![Tava na pausa dos estudos (2)](https://github.com/user-attachments/assets/7666aa7f-e93a-4925-a73d-2a6a290aaca9)
+
 
 ## Exemplo de uso
 
