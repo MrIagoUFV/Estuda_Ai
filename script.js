@@ -237,24 +237,15 @@ function tirarFoto() {
         canvas.getContext('2d').drawImage(video, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg');
         
-        console.log('Foto capturada:', imageDataUrl);
-        
-        const img = document.createElement('img');
-        img.src = imageDataUrl;
-        img.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 90%;
-            max-height: 90%;
-            z-index: 1001;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        `;
-        document.body.appendChild(img);
-        
         fecharCamera();
+        
+        // Converter o Data URL para um Blob
+        fetch(imageDataUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = new File([blob], "foto.jpg", { type: "image/jpeg" });
+                processarFoto(file);
+            });
     }
 
     // Função para fechar a câmera
@@ -263,6 +254,10 @@ function tirarFoto() {
         const tracks = stream.getTracks();
         tracks.forEach(track => track.stop());
         cameraContainer.remove();
+        const capturedImage = document.querySelector('img[style*="position: fixed"]');
+        if (capturedImage) {
+            capturedImage.remove();
+        }
     }
 
     // Adicionar event listeners
