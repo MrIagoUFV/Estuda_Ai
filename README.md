@@ -38,17 +38,36 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar
 
 Este projeto é distribuído sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
 
+## Idealização
 
----
+Meu irmão está estudando para um vestibular, e está estudando por questões, e algumas questões de matemática as ias não estão ainda conseguindo responder. Eu tava vendo ele estudar e quando isso acontecia, ele não sabia o que fazer, se não desistir da questão e passar pra próxima. Aí eu tive essa ideia:
 
-LINK: [https://mriago.me/Study-by-questions/](https://mriago.me/Estuda_Ai)
+Estuda Ai:
+
+É um projeto para ajudar estudantes a estudar por questões. Ele foca na interpretação da questão e não na resposta, para que o estudante possa entender o que está sendo pedido e assim conseguir resolver a questão depois de ver os vídeos e exercícios resolvidos.
+
+Como funciona:
+
+O usuário manda foto da questão que ele quer resolver e o Estuda Ai encontra os vídeos explicativos do tema e exercícios resolvidos parecidos. O usuário então pode assistir o vídeo e ver os exercícios resolvidos sem ficar travado na questão sem resposta.
+
+Além disso, o Estuda Ai também fornece uma aula completa sobre o tema da questão, com todos os detalhes necessários para o estudante entender o assunto, com uma "colinha" ao final com todas as informações importantes que ele precisa saber para resolver a questão.
 
 
-PRINT DA APLICAÇÃO (Para ser usado na imagem do da descrição do projeto portifólio):
+## LINK
 
-![image](https://github.com/user-attachments/assets/01a15361-c754-4864-b82d-aa5b58333b57)
+[https://mriago.me/Estuda_Ai/](https://mriago.me/Estuda_Ai)
 
-Exemplo de uso:
+## LOGO (Para ser usado na imagem do da descrição do projeto portifólio)
+
+![Design sem nome (11)](https://github.com/user-attachments/assets/65d0bec0-e009-47f8-aa3d-47d66f5ef20a)
+
+
+## PRINT DA APLICAÇÃO (Para ser usado na imagem do da descrição do projeto portifólio)
+
+![EstudaAi](https://github.com/user-attachments/assets/7666aa7f-e93a-4925-a73d-2a6a290aaca9)
+
+
+## Exemplo de uso
 
 Imagine que eu travei nessa questão e a IA não tá respondendo certo:
 
