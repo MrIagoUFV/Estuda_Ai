@@ -15,7 +15,7 @@ async function fileToGenerativePart(file) {
 }
 
 export async function Gemini(imageFile) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-thinking-exp-1219" });
   const imagePart = await fileToGenerativePart(imageFile);
 
   const prompt1 = "1. Liste os tópicos que a questão aborda, com um termo de pesquisa para o Youtube. \n2. Liste um termo de pesquisa específico para um exercício resolvido similar. (Por exemplo, se usuário enviou uma foto e após analisá-la, você identificar que a questão é sobre MRU, retorne termos de pesquisa como \"exercício resolvido movimento retilíneo uniforme\")\n\nFormatação:\n- Use marcadores para listar os tópicos.\n- Para cada termo de pesquisa, crie um link direto para a busca no YouTube no formato: [Termo de Pesquisa](https://www.youtube.com/results?search_query=termo+de+pesquisa+formatado).\n- Utilize markdown para estruturar e formatar o texto, incluindo títulos, subtítulos e ênfases onde apropriado.\n\nExemplo de estrutura:\n\n## Tópicos Abordados\n- Tópico 1: [Termo de Pesquisa](link)\n- ...\n\n## Como encontrar exercícios resolvidos similares\n- Exercício resolvido de ... : [Termo de Pesquisa](link)\n- ...\n";
